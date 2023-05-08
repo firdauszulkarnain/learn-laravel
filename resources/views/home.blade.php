@@ -8,7 +8,7 @@
                 <div class="card-header">Selamat Datang User</div>
 
                 <div class="card-body">
-                    Selamat Datang User : {{ $token }}
+                    @livewire('post-index')
                 </div>
             </div>
         </div>
