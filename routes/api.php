@@ -20,6 +20,6 @@ use App\Http\Controllers\API\PostController;
 // });
 
 
-Route::group(['middleware' => 'auth:sanctum'], function(){
-    Route::resource('/post', PostController::class);
+Route::group(['middleware' => 'auth:sanctum'], function () {
+    Route::resource('/post', PostController::class)->except(['create, edit']);
 });

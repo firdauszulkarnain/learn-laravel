@@ -5,85 +5,83 @@ namespace App\Http\Controllers\API;
 use App\Models\Post;
 use Illuminate\Http\Request;
 use App\Http\Controllers\Controller;
-use App\Http\Controllers\API\BaseController as BaseController;
 use App\Http\Resources\PostResource;
+use Illuminate\Support\Facades\Validator;
+use App\Http\Controllers\API\BaseController as BaseController;
 
 class PostController extends BaseController
 {
-    /**
-     * Display a listing of the resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function index()
     {
         $post = PostResource::collection(Post::get());
-        return $this->sendResponse($post, gettype($post));
+        return $this->sendResponse($post, 'Success Get Data Post');
     }
 
-    /**
-     * Show the form for creating a new resource.
-     *
-     * @return \Illuminate\Http\Response
-     */
     public function create()
     {
         //
     }
 
-    /**
-     * Store a newly created resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Http\Response
-     */
     public function store(Request $request)
     {
-        //
+        $validatedData = Validator::make($request->all(), [
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        if ($validatedData->fails()) {
+            return $this->sendError('Validation Error.', $validatedData->errors());
+        }
+
+        $post = new PostResource(Post::create($request->all()));
+        return $this->sendResponse($post, 'Success Created Post!');
     }
 
-    /**
-     * Display the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+
     public function show(Post $post)
     {
-        //
+        $post = Post::find($post->id);
+        if (!$post) {
+            return $this->sendError('Post Not Found!');
+        }
+
+        return $this->sendResponse(new PostResource($post), 'Success Get Data Post!');
     }
 
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+
     public function edit(Post $post)
     {
         //
     }
 
-    /**
-     * Update the specified resource in storage.
-     *
-     * @param  \Illuminate\Http\Request  $request
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+
     public function update(Request $request, Post $post)
     {
-        //
+        if (!$post) {
+            return $this->sendError('Post Not Found!');
+        }
+
+        $validatedData = Validator::make($request->all(), [
+            'title' => 'required',
+            'content' => 'required',
+        ]);
+
+        if ($validatedData->fails()) {
+            return $this->sendError('Validation Error.', $validatedData->errors());
+        }
+
+        $post = new PostResource(Post::find($post->id)->update($request->all()));
+        return $this->sendResponse($post, 'Success Update Data Post');
     }
 
-    /**
-     * Remove the specified resource from storage.
-     *
-     * @param  \App\Models\Post  $post
-     * @return \Illuminate\Http\Response
-     */
+
     public function destroy(Post $post)
     {
-        //
+        if (!$post) {
+            return $this->sendError('Post Not Found!');
+        }
+
+        $post->delete();
+        return $this->sendResponse([], 'Success Delete Data Post');
     }
 }

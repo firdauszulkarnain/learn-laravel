@@ -40,11 +40,12 @@ class LoginController extends Controller
 
     protected function redirectTo()
     {
-       
+
         if (auth()->user()->hasRole('admin')) {
             return route('admin');
         }
 
+        auth()->user()->createToken('token')->plainTextToken;
         return route('home');
     }
 }
